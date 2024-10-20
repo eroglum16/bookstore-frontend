@@ -5,6 +5,8 @@ import {mergeMap, map} from  '../rxjsStub';
 import { AddBookToCartRequest } from '../models/AddBookToCartRequest';
 import { BookDTO } from '../models/BookDTO';
 import { CartItemDTO } from '../models/CartItemDTO';
+import { OrderDTO } from '../models/OrderDTO';
+import { OrderItemDTO } from '../models/OrderItemDTO';
 import { OrderRequest } from '../models/OrderRequest';
 import { UserDTO } from '../models/UserDTO';
 
@@ -22,6 +24,33 @@ export class ObservableAuthControllerApi {
         this.configuration = configuration;
         this.requestFactory = requestFactory || new AuthControllerApiRequestFactory(configuration);
         this.responseProcessor = responseProcessor || new AuthControllerApiResponseProcessor();
+    }
+
+    /**
+     */
+    public loginWithHttpInfo(_options?: Configuration): Observable<HttpInfo<string>> {
+        const requestContextPromise = this.requestFactory.login(_options);
+
+        // build promise chain
+        let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+        for (const middleware of this.configuration.middleware) {
+            middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+        }
+
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
+            pipe(mergeMap((response: ResponseContext) => {
+                let middlewarePostObservable = of(response);
+                for (const middleware of this.configuration.middleware) {
+                    middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+                }
+                return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.loginWithHttpInfo(rsp)));
+            }));
+    }
+
+    /**
+     */
+    public login(_options?: Configuration): Observable<string> {
+        return this.loginWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<string>) => apiResponse.data));
     }
 
     /**
@@ -253,7 +282,7 @@ export class ObservableOrderControllerApi {
     /**
      * @param orderRequest
      */
-    public createOrderWithHttpInfo(orderRequest: OrderRequest, _options?: Configuration): Observable<HttpInfo<string>> {
+    public createOrderWithHttpInfo(orderRequest: OrderRequest, _options?: Configuration): Observable<HttpInfo<OrderDTO>> {
         const requestContextPromise = this.requestFactory.createOrder(orderRequest, _options);
 
         // build promise chain
@@ -275,8 +304,8 @@ export class ObservableOrderControllerApi {
     /**
      * @param orderRequest
      */
-    public createOrder(orderRequest: OrderRequest, _options?: Configuration): Observable<string> {
-        return this.createOrderWithHttpInfo(orderRequest, _options).pipe(map((apiResponse: HttpInfo<string>) => apiResponse.data));
+    public createOrder(orderRequest: OrderRequest, _options?: Configuration): Observable<OrderDTO> {
+        return this.createOrderWithHttpInfo(orderRequest, _options).pipe(map((apiResponse: HttpInfo<OrderDTO>) => apiResponse.data));
     }
 
 }

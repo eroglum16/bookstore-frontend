@@ -8,7 +8,7 @@ Method | HTTP request | Description
 
 
 # **createOrder**
-> string createOrder(orderRequest)
+> OrderDTO createOrder(orderRequest)
 
 
 ### Example
@@ -42,7 +42,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-**string**
+**OrderDTO**
 
 ### Authorization
 

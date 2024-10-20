@@ -4,11 +4,16 @@ import { Configuration} from '../configuration'
 import { AddBookToCartRequest } from '../models/AddBookToCartRequest';
 import { BookDTO } from '../models/BookDTO';
 import { CartItemDTO } from '../models/CartItemDTO';
+import { OrderDTO } from '../models/OrderDTO';
+import { OrderItemDTO } from '../models/OrderItemDTO';
 import { OrderRequest } from '../models/OrderRequest';
 import { UserDTO } from '../models/UserDTO';
 
 import { ObservableAuthControllerApi } from "./ObservableAPI";
 import { AuthControllerApiRequestFactory, AuthControllerApiResponseProcessor} from "../apis/AuthControllerApi";
+
+export interface AuthControllerApiLoginRequest {
+}
 
 export interface AuthControllerApiRegisterUserRequest {
     /**
@@ -24,6 +29,20 @@ export class ObjectAuthControllerApi {
 
     public constructor(configuration: Configuration, requestFactory?: AuthControllerApiRequestFactory, responseProcessor?: AuthControllerApiResponseProcessor) {
         this.api = new ObservableAuthControllerApi(configuration, requestFactory, responseProcessor);
+    }
+
+    /**
+     * @param param the request object
+     */
+    public loginWithHttpInfo(param: AuthControllerApiLoginRequest = {}, options?: Configuration): Promise<HttpInfo<string>> {
+        return this.api.loginWithHttpInfo( options).toPromise();
+    }
+
+    /**
+     * @param param the request object
+     */
+    public login(param: AuthControllerApiLoginRequest = {}, options?: Configuration): Promise<string> {
+        return this.api.login( options).toPromise();
     }
 
     /**
@@ -200,14 +219,14 @@ export class ObjectOrderControllerApi {
     /**
      * @param param the request object
      */
-    public createOrderWithHttpInfo(param: OrderControllerApiCreateOrderRequest, options?: Configuration): Promise<HttpInfo<string>> {
+    public createOrderWithHttpInfo(param: OrderControllerApiCreateOrderRequest, options?: Configuration): Promise<HttpInfo<OrderDTO>> {
         return this.api.createOrderWithHttpInfo(param.orderRequest,  options).toPromise();
     }
 
     /**
      * @param param the request object
      */
-    public createOrder(param: OrderControllerApiCreateOrderRequest, options?: Configuration): Promise<string> {
+    public createOrder(param: OrderControllerApiCreateOrderRequest, options?: Configuration): Promise<OrderDTO> {
         return this.api.createOrder(param.orderRequest,  options).toPromise();
     }
 

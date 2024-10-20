@@ -4,6 +4,8 @@ import { Configuration} from '../configuration'
 import { AddBookToCartRequest } from '../models/AddBookToCartRequest';
 import { BookDTO } from '../models/BookDTO';
 import { CartItemDTO } from '../models/CartItemDTO';
+import { OrderDTO } from '../models/OrderDTO';
+import { OrderItemDTO } from '../models/OrderItemDTO';
 import { OrderRequest } from '../models/OrderRequest';
 import { UserDTO } from '../models/UserDTO';
 import { ObservableAuthControllerApi } from './ObservableAPI';
@@ -18,6 +20,20 @@ export class PromiseAuthControllerApi {
         responseProcessor?: AuthControllerApiResponseProcessor
     ) {
         this.api = new ObservableAuthControllerApi(configuration, requestFactory, responseProcessor);
+    }
+
+    /**
+     */
+    public loginWithHttpInfo(_options?: Configuration): Promise<HttpInfo<string>> {
+        const result = this.api.loginWithHttpInfo(_options);
+        return result.toPromise();
+    }
+
+    /**
+     */
+    public login(_options?: Configuration): Promise<string> {
+        const result = this.api.login(_options);
+        return result.toPromise();
     }
 
     /**
@@ -174,7 +190,7 @@ export class PromiseOrderControllerApi {
     /**
      * @param orderRequest
      */
-    public createOrderWithHttpInfo(orderRequest: OrderRequest, _options?: Configuration): Promise<HttpInfo<string>> {
+    public createOrderWithHttpInfo(orderRequest: OrderRequest, _options?: Configuration): Promise<HttpInfo<OrderDTO>> {
         const result = this.api.createOrderWithHttpInfo(orderRequest, _options);
         return result.toPromise();
     }
@@ -182,7 +198,7 @@ export class PromiseOrderControllerApi {
     /**
      * @param orderRequest
      */
-    public createOrder(orderRequest: OrderRequest, _options?: Configuration): Promise<string> {
+    public createOrder(orderRequest: OrderRequest, _options?: Configuration): Promise<OrderDTO> {
         const result = this.api.createOrder(orderRequest, _options);
         return result.toPromise();
     }

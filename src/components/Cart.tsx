@@ -1,18 +1,37 @@
 import React, { useState } from 'react';
-import {CartItemDTO} from "../api-client";
+import {CartItemDTO, OrderDTO} from "../api-client";
+import {createOrder} from "../service/OrderService";
+import CartItem from "./CartItem";
+import OrderItem from "./OrderItem";
 
 interface CartProps {
     cartItems: CartItemDTO[];
     updateQuantity: (id: number, quantity: number) => void;
     removeItem: (id: number) => void;
+    fetchItems: () => void;
 }
 
-const Cart = ({ cartItems, updateQuantity, removeItem }: CartProps) => {
+const Cart = ({ cartItems, updateQuantity, removeItem, fetchItems }: CartProps) => {
     const [address, setAddress] = useState<string>('');
+    const [successMessage, setSuccessMessage] = useState<string>('');
+    const [errorMessage, setErrorMessage] = useState<string>('');
+    const [createdOrder, setCreatedOrder] = useState<OrderDTO | undefined>(undefined);
 
     const handleOrder = () => {
-        console.log('Order placed:', { cartItems, address });
-        // Handle the order submission logic
+        if (!address){
+            setErrorMessage("Please specify an address.")
+            return;
+        }
+        setErrorMessage("");
+        createOrder({address}).then((res) => {
+            if (res.status === 201) {
+                setAddress("");
+                fetchItems();
+                setSuccessMessage("You order has successfully been placed!");
+                setCreatedOrder(res.data);
+                console.log(res.data)
+            }
+        });
     };
 
     return (
@@ -23,31 +42,7 @@ const Cart = ({ cartItems, updateQuantity, removeItem }: CartProps) => {
                     <p className="text-gray-600">Your cart is empty</p>
                 )}
                 {cartItems.map((item: CartItemDTO) => (
-                    <div
-                        key={item.book?.id}
-                        className="flex items-center justify-between p-4 bg-white shadow-md rounded-md"
-                    >
-                        <div>
-                            <h3 className="text-lg font-semibold">{item.book?.title}</h3>
-                            <p className="text-gray-600">By {item.book?.authorName}</p>
-                            <p className="text-gray-800 font-bold">${item.book?.price?.toFixed(2)}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="number"
-                                min="1"
-                                value={item.quantity}
-                                onChange={(e) => updateQuantity(item.book?.id!, Number(e.target.value))}
-                                className="w-16 p-1 border rounded-md"
-                            />
-                            <button
-                                onClick={() => removeItem(item.book?.id!)}
-                                className="px-2 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700"
-                            >
-                                Remove
-                            </button>
-                        </div>
-                    </div>
+                    <CartItem key={item.id} item={item} updateQuantity={updateQuantity} removeItem={removeItem} />
                 ))}
             </div>
             {cartItems.length > 0 && (
@@ -76,6 +71,22 @@ const Cart = ({ cartItems, updateQuantity, removeItem }: CartProps) => {
                     </button>
                 </div>
             )}
+            {errorMessage && <p className="text-sm text-red-500 mt-4">{errorMessage}</p>}
+            {successMessage && <p className="text-sm text-green-600 mt-4">{successMessage}</p>}
+            {createdOrder ? (
+                <div className="flex flex-col gap-4 mt-4">
+                    <h3 className="font-semibold ">Summary of order:</h3>
+                    <div className="flex flex-col gap-4">
+                        {createdOrder.orderItems ? createdOrder.orderItems.map((item: CartItemDTO) => (
+                            <OrderItem key={item.id} item={item}/>
+                        )) : ""}
+                    </div>
+                    {createdOrder.totalPrice ? (
+                        <p className="text-sm">Total price: <span
+                            className="font-semibold">{createdOrder.totalPrice.toFixed(2)}</span></p>
+                    ) : ""}
+                </div>
+            ) : ""}
         </div>
     );
 };

@@ -1,6 +1,5 @@
 .gitattributes
 .gitignore
-.openapi-generator-ignore
 AuthControllerApi.md
 BookControllerApi.md
 CartControllerApi.md
@@ -23,6 +22,8 @@ models/AddBookToCartRequest.ts
 models/BookDTO.ts
 models/CartItemDTO.ts
 models/ObjectSerializer.ts
+models/OrderDTO.ts
+models/OrderItemDTO.ts
 models/OrderRequest.ts
 models/UserDTO.ts
 models/all.ts

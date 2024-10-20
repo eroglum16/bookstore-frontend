@@ -54,6 +54,7 @@ const Home = () => {
                     cartItems={cartItems}
                     updateQuantity={updateQuantity}
                     removeItem={removeItem}
+                    fetchItems={fetchItems}
                 />
             </div>
         </div>

@@ -1,12 +1,16 @@
 export * from '../models/AddBookToCartRequest';
 export * from '../models/BookDTO';
 export * from '../models/CartItemDTO';
+export * from '../models/OrderDTO';
+export * from '../models/OrderItemDTO';
 export * from '../models/OrderRequest';
 export * from '../models/UserDTO';
 
 import { AddBookToCartRequest } from '../models/AddBookToCartRequest';
 import { BookDTO } from '../models/BookDTO';
 import { CartItemDTO } from '../models/CartItemDTO';
+import { OrderDTO } from '../models/OrderDTO';
+import { OrderItemDTO } from '../models/OrderItemDTO';
 import { OrderRequest } from '../models/OrderRequest';
 import { UserDTO } from '../models/UserDTO';
 
@@ -29,6 +33,8 @@ let typeMap: {[index: string]: any} = {
     "AddBookToCartRequest": AddBookToCartRequest,
     "BookDTO": BookDTO,
     "CartItemDTO": CartItemDTO,
+    "OrderDTO": OrderDTO,
+    "OrderItemDTO": OrderItemDTO,
     "OrderRequest": OrderRequest,
     "UserDTO": UserDTO,
 }
